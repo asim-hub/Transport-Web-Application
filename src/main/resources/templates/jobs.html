@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jobs</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.22/"></script>
+
+
+<style>
+    .background {
+            position: center;
+        }
+        .background::before {
+            content: "";
+            background-image: url('https://wallpaperbat.com/img/567173-europe-wallpaper-music-hq-europe-picture-4k-wallpaper-2019.png');
+            background-size: cover;
+            background-repeat: repeat-y;
+            position: absolute;
+            top: 62px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            opacity: 0.1;
+        }
+        .content {
+            position: relative;
+            text-align: center;
+            display: flex;
+        }
+        .table {
+            width: 100%;
+            margin: auto;
+        }
+        html {
+            position: relative;
+            min-height: 100%;
+            padding-bottom: 0px;
+        }
+        body {
+            margin-bottom: 0px;
+        }
+
+.popover{
+    min-width: 600px; /* Max Width of the popover (depending on the container!) */
+}
+
+.modal {
+z-index: 1061 !important;
+
+}
+.modal-dialog {
+    min-width: 1140px;
+}
+
+#viewDiv {
+    padding: 0;
+    margin: 0;
+
+    height: 600px;
+    width: 1138px;
+  }
+
+</style>
+
+
+
+
+</head>
+<body>
+
+<header>
+    <div>
+        <nav th:include="fragments/navbar"></nav>
+    </div>
+
+</header>
+
+<div class="background">
+    <div class="content">
+<!--        <div class="container">-->
+<!--            <h2 style="text-align: center"> Jobs List </h2>-->
+<!--            <div class="col-lg-10 mt-5 mb-5">-->
+        <div class="table-responsive" style="position: relative; margin-top: 50px; margin-left: 50px; margin-right: 50px;">
+            <table class="table table-bordered table-striped table-dark w-auto">
+<!--                <table id="example" class="table table-bordered table-dark" style="width: 1000px">-->
+                <thead style="text-align: center">
+                <tr style="background-color: #0660a9">
+                    <th colspan="15">
+                        <h1> List of jobs </h1>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="font-size: 20px;min-width: 50px;">
+                        <i class="fas fa-sort-numeric-down"></i>
+                        ID
+                    </th>
+                    <th style="font-size: 20px;min-width: 130px;">
+                        <i class="fas fa-shopping-bag"></i>
+                        Goods Type
+                    </th>
+                    <th style="font-size: 20px;min-width: 120px;">
+                        <i class="fas fa-money-bill"></i>
+                        Total Money
+                    </th>
+                    <th style="font-size: 20px;min-width: 115px;">
+                        <i class="fas fa-money-bill-wave"></i>
+                        Profit
+                    </th>
+                    <th style="font-size: 20px;min-width: 100px;">
+                        <i class="fas fa-calendar-week"></i>
+                        Start Interval
+                    </th>
+                    <th style="font-size: 20px;min-width: 100px;">
+                        <i class="fas fa-calendar-week"></i>
+                        Finish Interval
+                    </th>
+                    <th style="font-size: 20px;min-width: 125px;">
+                        <i class="fas fa-arrows-alt"></i>
+                        Volume
+                    </th>
+                    <th style="font-size: 20px;min-width: 120px;">
+                        <i class="fas fa-weight-hanging"></i>
+                        Weight
+                    </th>
+                    <th style="font-size: 20px;min-width: 110px;">
+                        <i class="fas fa-truck"></i>
+                        Truck
+                    </th>
+                    <th style="font-size: 20px;min-width: 135px;">
+                        <i class="fas fa-arrows-alt-h"></i>
+                        Distance
+                    </th>
+<!--                    <th style="font-size: 20px;min-width: 115px;">-->
+<!--                        <i class="fas fa-map-marked-alt"></i>-->
+<!--                        Route-->
+<!--                    </th>-->
+                    <th style="font-size: 20px;min-width: 115px;">
+                        <i class="fas fa-chevron-circle-down"></i>
+                        Action
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="job : ${allJobsForm}" style="text-align: center">
+                    <td th:text="${job.id}">>job.id</td>
+                    <td th:text="${job.typeGoods}">job.typeGoods</td>
+                    <td th:text="${job.money}">job.money</td>
+                    <td th:text="${job.profit}">job.profit</td>
+                    <td th:text="${job.dateStart + ' - ' + job.dateStartMax}">job.start_interval</td>
+                    <td th:text="${job.dateStop + ' - ' + job.dateStopMax}">job.finish_interval</td>
+                    <td th:text="${job.volume}">job.volume</td>
+                    <td th:text="${job.weight}">job.weight</td>
+                    <td>
+                        <a tabindex="0" class="pop-show btn btn-info" type="button" data-placement="right" data-toggle="popover" title="Truck Info" data-content="">Show</a>
+                        <div class="pop-inn" style="display: none;">
+
+                                <table class="table table-bordered table-striped" style="width:100%">
+                                    <tr>
+                                        <th> Id </th>
+                                        <td th:text="${job.truck_id}">truck.id</td>
+                                        <th> Brand </th>
+                                        <td th:text="${job.truck_brand}">truck.brand</td>
+                                        <th> Height </th>
+                                        <td th:text="${job.truck_height}">truck.height</td>
+
+                                    </tr>
+                                    <tr>
+                                        <th> Full Price </th>
+                                        <td th:text="${job.truck_fullprice}">truck.fullprice</td>
+
+                                        <th> Empty Price </th>
+                                        <td th:text="${job.truck_emptyprice}">truck.emptyprice</td>
+                                        <th> Length </th>
+                                        <td th:text="${job.truck_length}">truck.length</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Weight </th>
+                                        <td th:text="${job.truck_weight}">truck.weight</td>
+                                        <th> Volume </th>
+                                        <td th:text="${job.truck_volume}">truck.volume</td>
+                                        <th> Width </th>
+                                        <td th:text="${job.truck_width}">truck.width</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Lat </th>
+                                        <td th:text="${job.truck_lat}">truck.lat</td>
+                                        <th> Lng </th>
+                                        <td th:text="${job.truck_lng}">truck.lng</td>
+                                        <th> Location </th>
+                                        <td>
+                                            <i class="fas fa-map-marked-alt btn btn-info" data-toggle="modal" data-target="#myModal"></i>
+
+                                            <script th:inline="javascript">
+                                                require([
+                                                  "esri/config",
+                                                  "esri/Map",
+                                                  "esri/views/MapView",
+
+                                                  "esri/rest/locator"
+
+                                                ], function(esriConfig, Map, MapView, locator) {
+
+                                                          esriConfig.apiKey = "AAPKfc023320ea5b4fb9955d7e74a5623fb4KZHfa6kn7i--Jv-1qxWZfL067XASOUpPONXgOqcnsQU8AgpZer-JDLilHLOJL9pY";
+
+                                                          const map = new Map({
+                                                            basemap: "arcgis-navigation"
+                                                          });
+
+                                                          const view = new MapView({
+                                                            container: "viewDiv",
+                                                            map: map,
+                                                            center: [26.10, 44.43],
+                                                            zoom: 10
+                                                          });
+
+                                                          const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+                                                          var lat = 44.43;
+                                                          var lng = 26.10;
+                                                          lat = /*[[${job.truck_lat}]]*/ 44.43;
+                                                          lng = /*[[${job.truck_lng}]]*/ 26.10;
+
+                                                          const point = { //Create a point
+                                                            type: "point",
+                                                            longitude: lng,
+                                                            latitude: lat
+                                                          };
+
+                                                                  const params = {
+                                                                        location: point
+                                                                  };
+
+                                                                     locator.locationToAddress(serviceUrl, params).then(function(response) { // Show the address found
+                                                                          const address = response.address;
+                                                                          showAddress(address, point);
+                                                                        }, function(err) { // Show no address found
+                                                                          showAddress("No address found.", point);
+                                                                        });
+
+
+                                                          function showAddress(address, pt) {
+                                                           view.popup.collapseEnabled = false;
+                                                            view.popup.open({
+                                                              content:  + Math.round(pt.longitude * 100000)/100000 + ", " + Math.round(pt.latitude * 100000)/100000,
+                                                              title: address,
+                                                              location: pt,
+                                                              collapsed: false
+                                                            });
+
+
+                                                          }
+
+                                                });
+                                            </script>
+
+
+                                        </td>
+
+                                    </tr>
+
+                                </table>
+
+                        </div>
+                    </td>
+                    <td th:text="${job.distance + job.length}">job.distance</td>
+<!--                    <td>View Route</td>-->
+                    <td>
+                        <a th:href="@{/job_view(request_Id=${job.request_id}, truck_Id=${job.truck_id})}" class="btn btn-info" style="width: 115px;">View Details</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:insert="fragments/footer"></div>
+
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Modal Heading</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal body -->
+            <div id="viewDiv" class="modal-body">
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+$(function () {
+  $(".pop-show").popover({
+    html: true,
+    sanitize: false,
+<!--    trigger: "focus",-->
+    content: function() {
+      return $('.pop-inn').html();
+    }
+  });
+})
+</script>
+
+</body>
+</html>

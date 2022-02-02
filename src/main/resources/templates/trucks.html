@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trucks</title>
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">-->
+<!--    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">-->
+<!--    <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css">-->
+<!--    <script src="https://js.arcgis.com/4.22/"></script>-->
+
+<!--    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>-->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.22/"></script>
+
+
+    <style>
+        .background {
+            position: center;
+        }
+        .background::before {
+            content: "";
+            background-image: url('https://wallpaperbat.com/img/567173-europe-wallpaper-music-hq-europe-picture-4k-wallpaper-2019.png');
+            background-size: cover;
+            background-repeat: repeat-y;
+            position: absolute;
+            top: 62px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            opacity: 0.1;
+        }
+        .content {
+            position: relative;
+            text-align: center;
+            display: flex;
+        }
+        .table {
+            width: 100%;
+            margin: auto;
+        }
+        html {
+            position: relative;
+            min-height: 100%;
+            padding-bottom: 0px;
+        }
+        body {
+            margin-bottom: 0px;
+        }
+        #viewDiv {
+    padding: 0;
+    margin: 0;
+
+    height: 600px;
+    width: 1138px;
+  }
+    </style>
+
+    <script>
+
+require([
+  "esri/config",
+  "esri/Map",
+  "esri/views/MapView",
+
+  "esri/rest/locator"
+
+], function(esriConfig, Map, MapView, locator) {
+
+  esriConfig.apiKey = "AAPKfc023320ea5b4fb9955d7e74a5623fb4KZHfa6kn7i--Jv-1qxWZfL067XASOUpPONXgOqcnsQU8AgpZer-JDLilHLOJL9pY";
+
+  const map = new Map({
+    basemap: "arcgis-navigation"
+  });
+
+  const view = new MapView({
+    container: "viewDiv",
+    map: map,
+    center: [26.10, 44.43],
+    zoom: 10
+  });
+
+  const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+  var lat = 0.0;
+  var lng = 0.0;
+
+  view.on("click", function(evt){
+      const params = {
+        location: evt.mapPoint
+
+      };
+      lat = parseFloat(evt.mapPoint.latitude.toFixed(5));
+      lng = parseFloat(evt.mapPoint.longitude.toFixed(5));
+
+        document.getElementById("fill").onclick = function() {myFunction(lat, lng)};
+
+function myFunction(lat, lng) {
+  document.getElementById("input_lat").value = lat;
+  document.getElementById("input_lng").value = lng;
+}
+
+     locator.locationToAddress(serviceUrl, params)
+        .then(function(response) { // Show the address found
+          const address = response.address;
+          showAddress(address, evt.mapPoint);
+        }, function(err) { // Show no address found
+          showAddress("No address found.", evt.mapPoint);
+        });
+
+    });
+
+  function showAddress(address, pt) {
+    view.popup.open({
+      title:  + Math.round(pt.longitude * 100000)/100000 + ", " + Math.round(pt.latitude * 100000)/100000,
+      content: address,
+      location: pt
+    });
+
+
+  }
+
+});
+</script>
+
+
+</head>
+<body>
+
+<header>
+    <div>
+        <nav th:include="fragments/navbar"></nav>
+    </div>
+</header>
+
+<div class="background">
+    <div class="content">
+        <div class="table-responsive" style="position: relative; margin-top: 40px; margin-left: 40px; margin-right: 40px;">
+            <table class="table table-bordered table-striped table-dark w-auto">
+                <thead style="text-align: center">
+                <tr style="background-color: #0660a9">
+                    <th colspan="15">
+                        <h1> List of trucks </h1>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-sort-numeric-down"></i>
+                        ID
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-truck"></i>
+                        Brand
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-tag"></i>
+                        Empty Price
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-tags"></i>
+                        Full Price
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-arrows-alt-v"></i>
+                        Height
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-ruler-vertical"></i>
+                        Length
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-ruler-horizontal"></i>
+                        Width
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-arrows-alt"></i>
+                        Volume
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-weight-hanging"></i>
+                        Weight
+                    </th>
+<!--                    <th style="font-size: 20px;">-->
+<!--                        <i class="fas fa-globe"></i>-->
+<!--                        Lat-->
+<!--                    </th>-->
+<!--                    <th style="font-size: 20px;">-->
+<!--                        <i class="fas fa-globe"></i>-->
+<!--                        Lng-->
+<!--                    </th>-->
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-globe"></i>
+                        Location
+                        <i class="far fa-hand-pointer btn btn-info" data-toggle="modal" data-target="#myModal"></i>
+
+<!--                         The Modal-->
+                        <div class="modal" id="myModal">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Modal Heading</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div id="viewDiv" class="modal-body">
+
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-success" data-dismiss="modal" id="fill">Fill</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </th>
+                    <th style="font-size: 20px">
+                        <i class="fas fa-chevron-circle-down"></i>
+                        Action
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <form id="myForm" method="POST" class="form-signin" th:object="${truckForm}" th:action="@{/trucks}" onSubmit="window.location.reload();">
+                        <tr>
+                            <th class="form-group" style="font-size: 20px;min-width: 70px;">
+                                <i class="fas fa-fingerprint"></i>
+                            </th>
+                            <th class="form-group" style="min-width: 115px;">
+                                <input type="text" th:field="*{brand}" class="form-control"
+                                       placeholder="Brand" autofocus="true" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('brand')}" th:errors="*{brand}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 165px;">
+                                <input type="text" th:field="*{emptyprice}" class="form-control"
+                                       placeholder="Empty Price" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('emptyprice')}" th:errors="*{emptyprice}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 145px;">
+                                <input type="text" th:field="*{fullprice}" class="form-control"
+                                       placeholder="Full Price" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('fullprice')}" th:errors="*{fullprice}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 105px;">
+                                <input type="text" th:field="*{height}" class="form-control"
+                                       placeholder="Height" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('height')}" th:errors="*{height}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 110px;">
+                                <input type="text" th:field="*{length}" class="form-control"
+                                       placeholder="Length" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('length')}" th:errors="*{length}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 115px;">
+                                <input type="text" th:field="*{width}" class="form-control"
+                                       placeholder="Width" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('width')}" th:errors="*{width}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 125px;">
+                                <input type="text" th:field="*{volume}" class="form-control"
+                                       placeholder="Volume" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('volume')}" th:errors="*{volume}"></span>
+                            </th>
+                            <th class="form-group" style="min-width: 120px;">
+                                <input type="text" th:field="*{weight}" class="form-control"
+                                       placeholder="Weight" required>
+                                <span class="has-error" th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></span>
+                            </th>
+<!--                            <th class="form-group" style="min-width: 70px;">-->
+<!--                                <input type="text" th:field="*{lat}" class="form-control"-->
+<!--                                       placeholder="Lat" required id="input_lat">-->
+<!--                                <span class="has-error" th:if="${#fields.hasErrors('lat')}" th:errors="*{lat}"></span>-->
+<!--                            </th>-->
+<!--                            <th class="form-group" style="min-width: 70px;">-->
+<!--                                <input type="text" th:field="*{lng}" class="form-control"-->
+<!--                                       placeholder="Lng" required id="input_lng">-->
+<!--                                <span class="has-error" th:if="${#fields.hasErrors('lng')}" th:errors="*{lng}"></span>-->
+<!--                            </th>-->
+                            <th class="form-group" style="min-width: 180px;">
+                                <input type="text" th:field="*{lat}" class="form-control"
+                                       placeholder="Lat" required id="input_lat">
+                                <span class="has-error" th:if="${#fields.hasErrors('lat')}" th:errors="*{lat}"></span>
+                                <input type="text" th:field="*{lng}" class="form-control"
+                                       placeholder="Lng" required id="input_lng">
+                                <span class="has-error" th:if="${#fields.hasErrors('lng')}" th:errors="*{lng}"></span>
+                            </th>
+                            <th style="min-width: 115px">
+                                <button class="btn btn-success" type="submit" style="min-width: 70px;">Add</button>
+                                <br>
+                                <br>
+                                <button class="btn btn-primary" type="reset" style="min-width: 70px;">Reset</button>
+                            </th>
+                        </tr>
+                    </form>
+                    <tr th:each="truck : ${allTrucksForm}" style="text-align: center">
+                        <td th:text="${truck.id}">truck.id</td>
+                        <td th:text="${truck.brand}">truck.brand</td>
+                        <td th:text="${truck.emptyprice}">truck.emptyprice</td>
+                        <td th:text="${truck.fullprice}">truck.fullprice</td>
+                        <td th:text="${truck.height}">truck.height</td>
+                        <td th:text="${truck.length}">truck.length</td>
+                        <td th:text="${truck.width}">truck.width</td>
+                        <td th:text="${truck.volume}">truck.volume</td>
+                        <td th:text="${truck.weight}">truck.weight</td>
+<!--                        <td th:text="${truck.lat}">truck.lat</td>-->
+<!--                        <td th:text="${truck.lng}">truck.lng</td>-->
+                        <td th:text="${truck.lat + ' / ' + truck.lng}">location</td>
+                        <td>
+                            <a th:href="@{/delete_truck(Id=${truck.id})}" class="btn btn-danger" style="width: 70px;">Delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<div th:insert="fragments/footer"></div>
+
+
+
+
+</body>
+</html>

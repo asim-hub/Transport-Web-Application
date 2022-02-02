@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>NavigationBar</title>
+    <style>
+
+.nav-item > a {
+  font-size: 30px;
+<!--  padding: 0px 10px;-->
+}
+
+.navbar .navbar-nav .nav-item .active {
+  background-color: #1670c9;
+  color: #000000;
+}
+.navbar .navbar-nav .nav-item:not(.nav-item-anon):hover {
+  background-color: #42b3f5;
+  color: #000000;
+}
+.navbar-custom {
+  height: 62px;
+<!--    background-color: #ffffff;-->
+<!--    color: #ffffff;-->
+}
+
+
+</style>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+<body>
+
+    <form id="logoutForm" method="POST" th:action="@{/logout}">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+    </form>
+
+<nav th:fragment="navbar" class="navbar navbar-custom navbar-expand-md navbar-dark bg-dark">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+        <ul class="navbar-nav mr-auto">
+
+                <div>
+                    <li class="nav-item">
+                        <a style="color:white" th:class="${#httpServletRequest.getRequestURI() == '/' or #httpServletRequest.getRequestURI().startsWith('/home') ? 'nav-link active':'nav-link'}" href="/home"> <i class="fas fa-home"></i> Home </a>
+                    </li>
+                </div>
+                <div sec:authorize="isAnonymous()">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link active" style="color:white;font-size: 30px;" href="."> <i class="fas fa-sign-in-alt"></i> <span th:text="${#httpServletRequest.getRequestURI().startsWith('/login') ? 'Login':'Register'}"> </span></a>
+                    </li>
+                </div>
+                <div sec:authorize="hasAuthority('ADMIN')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/orders') ? 'active':''}" href="/orders"> <i class="fas fa-bars"></i> Orders</a>
+                    </li>
+                </div>
+                <div sec:authorize="hasAuthority('ADMIN')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/jobs') ? 'active':''}" href="/jobs"> <i class="fas fa-truck-moving"></i> Available Jobs</a>
+                    </li>
+                </div>
+                <div sec:authorize="hasAuthority('SENDER')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/orders') ? 'active':''}" href="/orders"> <i class="fas fa-bars"></i> Orders</a>
+                    </li>
+                </div>
+                <div sec:authorize="hasAuthority('SENDER')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/contracts') ? 'active':''}" href="/contracts"> <i class="fas fa-file-contract"></i> Contracts</a>
+                    </li>
+                </div>
+
+                <div sec:authorize="hasAuthority('TRANSPORTER')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/job') ? 'active':''}" href="/jobs"> <i class="fas fa-truck-moving"></i> Available Jobs</a>
+                    </li>
+                </div>
+
+                <div sec:authorize="hasAuthority('TRANSPORTER')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/trucks') ? 'active':''}" href="/trucks"> <i class="fas fa-truck"></i> Trucks</a>
+                    </li>
+                </div>
+                <div sec:authorize="hasAuthority('TRANSPORTER')">
+                    <li class="nav-item list-inline-item">
+                        <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/contracts') ? 'active':''}" href="/contracts"> <i class="fas fa-file-contract"></i> Contracts</a>
+                    </li>
+                </div>
+        </ul>
+    </div>
+
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <div sec:authorize="isAnonymous()">
+                <li class="nav-item nav-item-anon">
+                    <a class="nav-link" style="color:white"> <i class="fas fa-user-slash "></i> <span sec:authentication="name"></span></a>
+                </li>
+            </div>
+            <div sec:authorize="isAuthenticated()">
+                <li class="nav-item list-inline-item" style="margin:-3px;">
+                    <a class="nav-link" style="color:white" th:classappend="${#httpServletRequest.getRequestURI().startsWith('/profile') ? 'active':''}" href="/profile"> <i class="fas fa-user-circle" th:classappend="${#authorization.expression('hasAuthority(''ADMIN'')') ? 'fas fa-user-cog':'fas fa-user-alt'}" ></i> <span sec:authentication="name"></span></a>
+
+                </li>
+                <li class="nav-item list-inline-item" style="margin:-3px;">
+                    <a class="nav-link" style="text-align:right;cursor:pointer;color:white;" onclick="document.forms['logoutForm'].submit()"> <i class="fas fa-door-open"></i> Logout </a>
+                </li>
+            </div>
+
+
+        </ul>
+    </div>
+</nav>
+
+</body>
+</html>

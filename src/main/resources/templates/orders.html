@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orders</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.22/"></script>
+
+    <style>
+        .background {
+            position: center;
+        }
+        .background::before {
+            content: "";
+            background-image: url('https://wallpaperbat.com/img/567173-europe-wallpaper-music-hq-europe-picture-4k-wallpaper-2019.png');
+            background-size: cover;
+            background-repeat: repeat-y;
+            position: absolute;
+            top: 62px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            opacity: 0.1;
+        }
+        .content {
+            position: relative;
+            text-align: center;
+            display: flex;
+        }
+        .table {
+            width: 100%;
+            margin: auto;
+        }
+        html {
+            position: relative;
+            min-height: 100%;
+            padding-bottom: 0px;
+        }
+        body {
+            margin-bottom: 0px;
+        }
+        #viewDiv1 {
+            padding: 0;
+            margin: 0;
+
+            height: 600px;
+            width: 1138px;
+        }
+        #viewDiv2 {
+            padding: 0;
+            margin: 0;
+
+            height: 600px;
+            width: 1138px;
+        }
+    </style>
+    <script>
+        require([
+            "esri/config",
+            "esri/Map",
+            "esri/views/MapView",
+
+            "esri/rest/locator"
+
+        ], function(esriConfig, Map, MapView, locator) {
+
+            esriConfig.apiKey = "AAPKfc023320ea5b4fb9955d7e74a5623fb4KZHfa6kn7i--Jv-1qxWZfL067XASOUpPONXgOqcnsQU8AgpZer-JDLilHLOJL9pY";
+
+            const map = new Map({
+                basemap: "arcgis-navigation"
+            });
+
+            const view = new MapView({
+                container: "viewDiv1",
+                map: map,
+                center: [26.10, 44.43],
+                zoom: 10
+            });
+
+            const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+            var lat = 0.0;
+            var lng = 0.0;
+
+            view.on("click", function(evt){
+                const params = {
+                    location: evt.mapPoint
+
+                };
+
+                lat = parseFloat(evt.mapPoint.latitude.toFixed(5));
+                lng = parseFloat(evt.mapPoint.longitude.toFixed(5));
+
+                document.getElementById("fill1").onclick = function() {myFunction(lat, lng)};
+
+                function myFunction(lat, lng) {
+                    document.getElementById("input_lat1").value = lat;
+                    document.getElementById("input_lng1").value = lng;
+                }
+
+                locator.locationToAddress(serviceUrl, params)
+                    .then(function(response) { // Show the address found
+                        const address = response.address;
+                        showAddress(address, evt.mapPoint);
+                    }, function(err) { // Show no address found
+                        showAddress("No address found.", evt.mapPoint);
+                    });
+
+            });
+
+            function showAddress(address, pt) {
+                view.popup.open({
+                    title:  + Math.round(pt.longitude * 100000)/100000 + ", " + Math.round(pt.latitude * 100000)/100000,
+                    content: address,
+                    location: pt
+                });
+            }
+        });
+    </script>
+    <script>
+        require([
+            "esri/config",
+            "esri/Map",
+            "esri/views/MapView",
+
+            "esri/rest/locator"
+
+        ], function(esriConfig, Map, MapView, locator) {
+
+            esriConfig.apiKey = "AAPKfc023320ea5b4fb9955d7e74a5623fb4KZHfa6kn7i--Jv-1qxWZfL067XASOUpPONXgOqcnsQU8AgpZer-JDLilHLOJL9pY";
+
+            const map = new Map({
+                basemap: "arcgis-navigation"
+            });
+
+            const view = new MapView({
+                container: "viewDiv2",
+                map: map,
+                center: [26.10, 44.43],
+                zoom: 10
+            });
+
+            const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+            var lat = 0.0;
+            var lng = 0.0;
+
+            view.on("click", function(evt){
+                const params = {
+                    location: evt.mapPoint
+
+                };
+
+                lat = parseFloat(evt.mapPoint.latitude.toFixed(5));
+                lng = parseFloat(evt.mapPoint.longitude.toFixed(5));
+
+                document.getElementById("fill2").onclick = function() {myFunction(lat, lng)};
+
+                function myFunction(lat, lng) {
+                    document.getElementById("input_lat2").value = lat;
+                    document.getElementById("input_lng2").value = lng;
+                }
+
+                locator.locationToAddress(serviceUrl, params)
+                    .then(function(response) { // Show the address found
+                        const address = response.address;
+                        showAddress(address, evt.mapPoint);
+                    }, function(err) { // Show no address found
+                        showAddress("No address found.", evt.mapPoint);
+                    });
+
+            });
+
+            function showAddress(address, pt) {
+                view.popup.open({
+                    title:  + Math.round(pt.longitude * 100000)/100000 + ", " + Math.round(pt.latitude * 100000)/100000,
+                    content: address,
+                    location: pt
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+
+<header>
+    <div>
+        <nav th:include="fragments/navbar"></nav>
+    </div>
+</header>
+
+<div class="background">
+    <div class="content">
+        <div class="table-responsive" style="position: relative; margin-top: 50px; margin-left: 50px; margin-right: 50px;">
+            <table class="table table-bordered table-striped table-dark w-auto">
+                <thead style="text-align: center">
+                <tr style="background-color: #0660a9">
+                    <th colspan="15">
+                        <h1> List of orders </h1>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-sort-numeric-down"></i>
+                        ID
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="far fa-calendar-alt"></i>
+                        Start Date
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-calendar-alt"></i>
+                        Max Start Date
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="far fa-calendar-alt"></i>
+                        Stop Date
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-calendar-alt"></i>
+                        Max Stop Date
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-shopping-bag"></i>
+                        Type of Goods
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-euro-sign"></i>
+                        Money
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-weight-hanging"></i>
+                        Weight
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-arrows-alt"></i>
+                        Volume
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-globe"></i>
+                        Destination Location
+                        <i class="far fa-hand-pointer btn btn-info" data-toggle="modal" data-target="#myModal1"></i>
+
+                        <!--                         The Modal-->
+                        <div class="modal" id="myModal1">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Modal Heading</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div id="viewDiv1" class="modal-body">
+
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-success" data-dismiss="modal" id="fill1">Fill</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                    <th style="font-size: 20px;">
+                        <i class="fas fa-globe"></i>
+                        Source Location
+                        <i class="far fa-hand-pointer btn btn-info" data-toggle="modal" data-target="#myModal2"></i>
+
+                        <!--                         The Modal-->
+                        <div class="modal" id="myModal2">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+
+                                    <!-- Modal Header -->
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Modal Heading</h4>
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    </div>
+
+                                    <!-- Modal body -->
+                                    <div id="viewDiv2" class="modal-body">
+
+                                    </div>
+
+                                    <!-- Modal footer -->
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-success" data-dismiss="modal" id="fill2">Fill</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </th>
+                    <th style="font-size: 20px">
+                        <i class="fas fa-chevron-circle-down"></i>
+                        Action
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <form id="myForm" method="POST" class="form-signin" th:object="${requestForm}" th:action="@{/orders}" onSubmit="window.location.reload();">
+                    <tr>
+                        <th class="form-group" style="font-size: 20px;width: 70px;">
+                            <i class="fas fa-fingerprint"></i>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{dateStart}" class="form-control"
+                                   placeholder="Start Date" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('dateStart')}" th:errors="*{dateStart}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{dateStartMax}" class="form-control"
+                                   placeholder="Max Start Date" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('dateStartMax')}" th:errors="*{dateStartMax}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{dateStop}" class="form-control"
+                                   placeholder="Stop Date" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('dateStop')}" th:errors="*{dateStop}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{dateStopMax}" class="form-control"
+                                   placeholder="Max Stop Date" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('dateStopMax')}" th:errors="*{dateStopMax}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{typeGoods}" class="form-control"
+                                   placeholder="Type of Goods" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('typeGoods')}" th:errors="*{typeGoods}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{money}" class="form-control"
+                                   placeholder="Money" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('money')}" th:errors="*{money}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{weight}" class="form-control"
+                                   placeholder="Weight" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></span>
+                        </th>
+                        <th class="form-group">
+                            <input type="text" th:field="*{volume}" class="form-control"
+                                   placeholder="Volume" autofocus="true" required>
+                            <span class="has-error" th:if="${#fields.hasErrors('volume')}" th:errors="*{volume}"></span>
+                        </th>
+                        <!--                            <th class="form-group">-->
+                        <!--                                <input type="text" th:field="*{destination_lat}" class="form-control"-->
+                        <!--                                       placeholder="Destination Latitude" autofocus="true" required>-->
+                        <!--                                <span class="has-error" th:if="${#fields.hasErrors('destination_lat')}" th:errors="*{destination_lat}"></span>-->
+                        <!--                            </th>-->
+                        <!--                            <th class="form-group">-->
+                        <!--                                <input type="text" th:field="*{destination_lng}" class="form-control"-->
+                        <!--                                       placeholder="Destination Longitude" autofocus="true" required>-->
+                        <!--                                <span class="has-error" th:if="${#fields.hasErrors('destination_lng')}" th:errors="*{destination_lng}"></span>-->
+                        <!--                            </th>-->
+                        <!--                            <th class="form-group">-->
+                        <!--                                <input type="text" th:field="*{source_lat}" class="form-control"-->
+                        <!--                                       placeholder="Source Latitude" autofocus="true" required>-->
+                        <!--                                <span class="has-error" th:if="${#fields.hasErrors('source_lat')}" th:errors="*{source_lat}"></span>-->
+                        <!--                            </th>-->
+                        <!--                            <th class="form-group">-->
+                        <!--                                <input type="text" th:field="*{source_lng}" class="form-control"-->
+                        <!--                                       placeholder="Source Longitude" autofocus="true" required>-->
+                        <!--                                <span class="has-error" th:if="${#fields.hasErrors('source_lng')}" th:errors="*{source_lng}"></span>-->
+                        <!--                            </th>-->
+                        <th class="form-group" style="min-width: 180px;">
+                            <input type="text" th:field="*{destination_lat}" class="form-control"
+                                   placeholder="Dest Lat" required id="input_lat1">
+                            <span class="has-error" th:if="${#fields.hasErrors('destination_lat')}" th:errors="*{destination_lat}"></span>
+                            <input type="text" th:field="*{destination_lng}" class="form-control"
+                                   placeholder="Dest Lng" required id="input_lng1">
+                            <span class="has-error" th:if="${#fields.hasErrors('destination_lng')}" th:errors="*{destination_lng}"></span>
+                        </th>
+                        <th class="form-group" style="min-width: 180px;">
+                            <input type="text" th:field="*{source_lat}" class="form-control"
+                                   placeholder="Src Lat" required id="input_lat2">
+                            <span class="has-error" th:if="${#fields.hasErrors('source_lat')}" th:errors="*{source_lat}"></span>
+                            <input type="text" th:field="*{source_lng}" class="form-control"
+                                   placeholder="Src Lng" required id="input_lng2">
+                            <span class="has-error" th:if="${#fields.hasErrors('source_lng')}" th:errors="*{source_lng}"></span>
+                        </th>
+                        <th style="min-width: 115px">
+                            <button class="btn btn-success" type="submit" style="min-width: 70px;">Add</button>
+                            <button class="btn btn-primary" type="reset" style="min-width: 70px;">Reset</button>
+                        </th>
+                    </tr>
+                </form>
+                <tr th:each="request : ${allRequestsForm}" style="text-align: center">
+                    <td th:text="${request.id}">request.id</td>
+                    <td th:text="${request.dateStart}">request.dateStart</td>
+                    <td th:text="${request.dateStartMax}">request.dateStartMax</td>
+                    <td th:text="${request.dateStop}">request.dateStop</td>
+                    <td th:text="${request.dateStopMax}">request.dateStopMax</td>
+                    <td th:text="${request.typeGoods}">request.typeGoods</td>
+                    <td th:text="${request.money}">request.money</td>
+                    <td th:text="${request.weight}">request.weight</td>
+                    <td th:text="${request.volume}">request.volume</td>
+                    <!--                        <td th:text="${request.destination_lat}">request.destination_lat</td>-->
+                    <!--                        <td th:text="${request.destination_lng}">request.destination_lng</td>-->
+                    <!--                        <td th:text="${request.source_lat}">request.source_lat</td>-->
+                    <!--                        <td th:text="${request.source_lng}">request.source_lng</td>-->
+                    <td th:text="${request.destination_lat + ' / ' + request.destination_lng}">location1</td>
+                    <td th:text="${request.source_lat + ' / ' + request.source_lng}">location2</td>
+                    <td>
+                        <a th:href="@{/delete_order(Id=${request.id})}" class="btn btn-danger" style="width: 70px;">Delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:insert="fragments/footer"></div>
+
+</body>
+</html>

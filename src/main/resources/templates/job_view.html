@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>View Job</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.22/"></script>
+    <style>
+        .background {
+            position: center;
+        }
+        .background::before {
+            content: "";
+            background-image: url('https://wallpaperbat.com/img/567173-europe-wallpaper-music-hq-europe-picture-4k-wallpaper-2019.png');
+            background-size: cover;
+            background-repeat: repeat-y;
+            position: absolute;
+            top: 62px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            opacity: 0.1;
+        }
+        .content {
+            position: relative;
+            text-align: center;
+            display: flex;
+        }
+        .table {
+            width: 100%;
+            margin: auto;
+        }
+        html {
+            position: relative;
+            min-height: 100%;
+            padding-bottom: 0px;
+        }
+        body {
+            margin-bottom: 0px;
+        }
+  #viewDiv {
+    padding: 0;
+    margin: auto;
+    height: 100%;
+    width: 100%;
+  }
+ </style>
+
+    <script th:inline="javascript">
+
+    require([
+      "esri/config",
+      "esri/Map",
+      "esri/views/MapView",
+
+      "esri/Graphic",
+      "esri/rest/route",
+      "esri/rest/support/RouteParameters",
+      "esri/rest/support/FeatureSet"
+
+    ], function(esriConfig, Map, MapView, Graphic, route, RouteParameters, FeatureSet) {
+
+    esriConfig.apiKey = "AAPKfc023320ea5b4fb9955d7e74a5623fb4KZHfa6kn7i--Jv-1qxWZfL067XASOUpPONXgOqcnsQU8AgpZer-JDLilHLOJL9pY";
+
+    const map = new Map({
+      basemap: "arcgis-navigation" //Basemap layer service
+    });
+
+    const view = new MapView({
+      container: "viewDiv",
+      map: map,
+      center: [26.10, 44.43], //Longitude, latitude
+      zoom: 8
+    });
+
+    const routeUrl = "https://route-api.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World";
+
+      var truck_lat = /*[[${job.truck_lat}]]*/ 0.00;
+      var truck_lng = /*[[${job.truck_lng}]]*/ 0.00;
+      var source_lat = /*[[${job.source_lat}]]*/ 0.00;
+      var source_lng = /*[[${job.source_lng}]]*/ 0.00;
+      var destination_lat = /*[[${job.destination_lat}]]*/ 0.00;
+      var destination_lng = /*[[${job.destination_lng}]]*/ 0.00;
+
+      const start_point = { //Create a point
+          type: "point",
+          longitude: truck_lng,
+          latitude: truck_lat
+        };
+      const src_point = { //Create a point
+          type: "point",
+          longitude: source_lng,
+          latitude: source_lat
+        };
+      const dst_point = { //Create a point
+          type: "point",
+          longitude: destination_lng,
+          latitude: destination_lat
+        };
+
+
+
+        addGraphic("origin", src_point);
+        addGraphic("destination", dst_point);
+        getRoute2();
+
+        addGraphic("start", start_point);
+        addGraphic("origin", src_point);
+        getRoute1();
+
+    function addGraphic(type, point) {
+      const graphic = new Graphic({
+        symbol: {
+          type: "simple-marker",
+          color: (type === "start") ? "green" : (type === "origin") ? "white" : "black",
+          size: "12px"
+        },
+        geometry: point
+      });
+      view.graphics.add(graphic);
+    }
+
+    function getRoute1() {
+      const routeParams = new RouteParameters({
+        stops: new FeatureSet({
+          features: view.graphics.toArray().slice(-2)
+        }),
+
+        returnDirections: true
+
+      });
+
+      route.solve(routeUrl, routeParams)
+        .then(function(data) {
+          data.routeResults.forEach(function(result) {
+            result.route.symbol = {
+              type: "simple-line",
+              color: [50, 50, 50, 0.9],
+              width: 2
+            };
+            view.graphics.add(result.route);
+          });
+
+          // Display directions
+
+
+        })
+
+        .catch(function(error){
+            console.log(error);
+        })
+
+    }
+
+    function getRoute2() {
+      const routeParams = new RouteParameters({
+        stops: new FeatureSet({
+          features: view.graphics.toArray().slice(-2)
+        }),
+
+        returnDirections: true
+
+      });
+
+      route.solve(routeUrl, routeParams)
+        .then(function(data) {
+          data.routeResults.forEach(function(result) {
+            result.route.symbol = {
+              type: "simple-line",
+              color: [50, 130, 255, 0.7],
+              width: 6
+            };
+            view.graphics.add(result.route);
+          });
+
+          // Display directions
+
+
+        })
+
+        .catch(function(error){
+            console.log(error);
+        })
+
+    }
+
+  });
+  </script>
+
+
+</head>
+<body>
+
+<header>
+    <div>
+        <nav th:include="fragments/navbar"></nav>
+    </div>
+
+</header>
+
+<div class="background">
+    <div class="content">
+
+        <div class="container">
+            <div class="row">
+                <div id="viewDiv" style="position: relative; width: 1200px; height: 675px; border:2px solid #575757;"></div>
+            </div>
+            <div class="row" style="margin-top:15px;">
+                <div class="table-responsive" style="position: relative; margin-top: 0px; margin-left: 0px; margin-right: 0px;">
+                    <table class="table table-bordered table-striped table-dark w-auto" style="min-width:1140px">
+                        <thead style="text-align: center">
+                        <tr style="background-color: #0660a9">
+                            <th colspan="15">
+                                <h3> Truck </h3>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tr>
+                            <th> <i class="fas fa-fingerprint"></i> Id </th>
+                            <td th:text="${job.truck_id}">truck.id</td>
+                            <th> <i class="fas fa-truck"></i> Brand </th>
+                            <td th:text="${job.truck_brand}">truck.brand</td>
+                            <th> <i class="fas fa-arrows-alt-v"></i> Height </th>
+                            <td th:text="${job.truck_height}">truck.height</td>
+
+                        </tr>
+                        <tr>
+                            <th> <i class="fas fa-tags"></i> Full Price </th>
+                            <td th:text="${job.truck_fullprice}">truck.fullprice</td>
+
+                            <th> <i class="fas fa-tag"></i> Empty Price </th>
+                            <td th:text="${job.truck_emptyprice}">truck.emptyprice</td>
+                            <th> <i class="fas fa-ruler-vertical"></i> Length </th>
+                            <td th:text="${job.truck_length}">truck.length</td>
+                        </tr>
+                        <tr>
+                            <th> <i class="fas fa-weight-hanging"></i> Weight </th>
+                            <td th:text="${job.truck_weight}">truck.weight</td>
+                            <th> <i class="fas fa-arrows-alt"></i> Volume </th>
+                            <td th:text="${job.truck_volume}">truck.volume</td>
+                            <th> <i class="fas fa-ruler-horizontal"></i> Width </th>
+                            <td th:text="${job.truck_width}">truck.width</td>
+                        </tr>
+                        <tr>
+                            <th> <i class="fas fa-globe"></i> Lat </th>
+                            <td th:text="${job.truck_lat}">truck.lat</td>
+                            <th> <i class="fas fa-globe"></i> Lng </th>
+                            <td th:text="${job.truck_lng}">truck.lng</td>
+                            <th>
+                                <i class="fas fa-map-marker-alt"></i>
+                                Location
+                            </th>
+                            <td style="max-width: 200px">
+                                <p id="truck_address">
+                                    A
+                                </p>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 0px;">
+
+                <div class="table-responsive" style="position: relative; margin-top: 0px; margin-left: 0px; margin-right: 0px;">
+                    <table class="table table-bordered table-striped table-dark w-auto" style="min-width:1140px">
+                        <thead style="text-align: center">
+                        <tr style="background-color: #0660a9">
+                            <th colspan="15">
+                                <h3> Request </h3>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-shopping-bag"></i>
+                                Goods Type
+                            </th>
+                            <th>
+                                <i class="fas fa-money-bill"></i>
+                                Total Money
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar-week"></i>
+                                Start Interval
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar-week"></i>
+                                Finish Interval
+                            </th>
+                            <th>
+                                <i class="fas fa-arrows-alt"></i>
+                                Volume
+                            </th>
+                            <th>
+                                <i class="fas fa-weight-hanging"></i>
+                                Weight
+                            </th>
+
+                            <th>
+                                <i class="fas fa-arrows-alt-h"></i>
+                                Total Distance
+                            </th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="text-align: center">
+                            <td th:text="${job.typeGoods}">job.typeGoods</td>
+                            <td th:text="${job.money}">job.money</td>
+                            <td th:text="${job.dateStart + ' - ' + job.dateStartMax}">job.start_interval</td>
+                            <td th:text="${job.dateStop + ' - ' + job.dateStopMax}">job.finish_interval</td>
+                            <td th:text="${job.volume}">job.volume</td>
+                            <td th:text="${job.weight}">job.weight</td>
+
+                            <td th:text="${{job.distance + job.length}}">job.distance</td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+
+            <div class="row" style="margin-top: 0px;">
+
+                <div class="table-responsive" style="position: relative; margin-top: 0px; margin-left: 0px; margin-right: 0px;">
+                    <table class="table table-bordered table-striped table-dark w-auto" style="min-width:1140px">
+                        <thead style="text-align: center">
+                        <tr style="background-color: #0660a9">
+                            <th colspan="15">
+                                <h3> Job </h3>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <i class="fas fa-money-bill-wave"></i>
+                                Estimated Profit
+                            </th>
+                            <th>
+                                <i class="fas fa-calendar-week"></i>
+                                Time to complete
+                            </th>
+                            <th>
+                                <i class="fas fa-road"></i>
+                                Distance to start
+                            </th>
+                            <th>
+                                <i class="fas fa-route"></i>
+                                Transport Distance
+                            </th>
+                            <th>
+                                <i class="fas fa-chevron-circle-down"></i>
+                                Action
+                            </th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr style="text-align: center">
+                            <td th:text="${job.profit}">job.profit</td>
+                            <td>Time</td>
+
+                            <td th:text="${job.distance}">job.distance</td>
+                            <td th:text="${job.length}">job.length</td>
+                            <th rowspan="3">
+                                <a th:href="@{/create_contract(request_Id=${job.request_id}, truck_Id=${job.truck_id})}" class="btn btn-success" style="width: 115px;">Accept</a>
+                            </th>
+
+                        </tr>
+                        <tr>
+
+                            <th colspan="2">
+                                <i class="fas fa-map-marked-alt"></i>
+                                Start Location
+                            </th>
+                            <th colspan="2">
+                                <i class="fas fa-map-marked"></i>
+                                Final Destination
+                            </th>
+
+                        </tr>
+
+                        <tr style="text-align: center">
+                            <td colspan="2">
+                                <p id="source_address">
+                                    S
+                                </p>
+                            </td>
+                            <td colspan="2">
+                                <p id="destination_address">
+                                    F
+                                </p>
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+    </div>
+</div>
+
+<div th:insert="fragments/footer"></div>
+
+<script th:inline="javascript">
+        require([
+          "esri/config",
+          "esri/Map",
+          "esri/views/MapView",
+
+          "esri/rest/locator"
+
+        ], function(esriConfig, Map, MapView, locator) {
+
+                  esriConfig.apiKey = "AAPKfc023320ea5b4fb9955d7e74a5623fb4KZHfa6kn7i--Jv-1qxWZfL067XASOUpPONXgOqcnsQU8AgpZer-JDLilHLOJL9pY";
+
+                  const map = new Map({
+                    basemap: "arcgis-navigation"
+                  });
+
+                  const view = new MapView({
+                    container: "viewDiv_hidden",
+                    map: map,
+                    center: [26.10, 44.43],
+                    zoom: 10
+                  });
+
+                  const serviceUrl = "http://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+
+                  var lat_start = /*[[${job.truck_lat}]]*/ 44.43;
+                  var lng_start = /*[[${job.truck_lng}]]*/ 26.10;
+                  const start_point = { //Create a point
+                    type: "point",
+                    longitude: lng_start,
+                    latitude: lat_start
+                  };
+                  const start_params = {
+                        location: start_point
+                  };
+                  locator.locationToAddress(serviceUrl, start_params).then(function(response) { // Show the address found
+                          var address = response.address;
+                          document.getElementById('truck_address').innerHTML = address;
+                        }, function(err) { // Show no address found
+                            document.getElementById('truck_address').innerHTML = "No address found";
+                        });
+
+                  var lat_source = /*[[${job.source_lat}]]*/ 44.43;
+                  var lng_source = /*[[${job.source_lng}]]*/ 26.10;
+                  const source_point = { //Create a point
+                    type: "point",
+                    longitude: lng_source,
+                    latitude: lat_source
+                  };
+                  const source_params = {
+                        location: source_point
+                  };
+                  locator.locationToAddress(serviceUrl, source_params).then(function(response) { // Show the address found
+                          var address = response.address;
+                          document.getElementById('source_address').innerHTML = address;
+                        }, function(err) { // Show no address found
+                            document.getElementById('source_address').innerHTML = "No address found";
+                        });
+
+                  var lat_destination = /*[[${job.destination_lat}]]*/ 44.43;
+                  var lng_destination = /*[[${job.destination_lng}]]*/ 26.10;
+                  const destination_point = { //Create a point
+                    type: "point",
+                    longitude: lng_destination,
+                    latitude: lat_destination
+                  };
+                  const destination_params = {
+                        location: destination_point
+                  };
+                  locator.locationToAddress(serviceUrl, destination_params).then(function(response) { // Show the address found
+                          var address = response.address;
+                          document.getElementById('destination_address').innerHTML = address;
+                        }, function(err) { // Show no address found
+                            document.getElementById('destination_address').innerHTML = "No address found";
+                        });
+
+
+        });
+</script>
+
+</body>
+</html>
